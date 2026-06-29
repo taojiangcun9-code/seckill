@@ -13,23 +13,25 @@ public class SeckillService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    // Lua脚本（原子扣库存）
-    private static final String LUA_SCRIPT =
-            "local stock = tonumber(redis.call('get', KEYS[1])) " +
-                    "if stock == nil then return -2 end " +
-                    "if stock <= 0 then return -1 end " +
-                    "stock = stock - tonumber(ARGV[1]) " +
-                    "redis.call('set', KEYS[1], stock) " +
-                    "return stock";
 
-    /**
-     * Lua原子扣库存
-     * @param goodsId 商品ID
-     * @return
-     *  -2：商品不存在
-     *  -1：库存不足
-     *  >=0：剩余库存
-     */
+    private static final String LUA_SCRIPT =
+            "local stock = tonumber(redis.call('get', KEYS[1]))\n" +
+                    "\n" +
+                    "if not stock then\n" +
+                    "    return -2\n" +
+                    "end\n" +
+                    "\n" +
+                    "if stock <= 0 then\n" +
+                    "    return -1\n" +
+                    "end\n" +
+                    "\n" +
+                    "if stock - 1 < 0 then\n" +
+                    "    return -1\n" +
+                    "end\n" +
+                    "\n" +
+                    "return redis.call('decr', KEYS[1])";
+
+
     public Long luaDeductStock(Long goodsId) {
 
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
@@ -38,8 +40,7 @@ public class SeckillService {
 
         return redisTemplate.execute(
                 script,
-                Collections.singletonList("stock:" + goodsId),
-                "1"
+                Collections.singletonList("stock:" + goodsId)
         );
     }
 }

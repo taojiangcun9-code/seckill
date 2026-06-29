@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>秒杀商品列表</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+        }
+
+        .container {
+            width: 900px;
+            margin: 50px auto;
+        }
+
+        .item {
+            background: #fff;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info {
+            line-height: 1.8;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>秒杀商品列表</h2>
+    <div id="list"></div>
+</div>
+
+<script>
+    // 页面加载后请求商品
+    window.onload = function () {
+        loadGoods();
+    };
+
+    function loadGoods() {
+        fetch("/goods/seckill/list", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("token")
+            }
+        })
+            .then(res => res.json())
+            .then(res => {
+                // 兼容你的 Result<T>
+                if (res.code !== 0) {
+                    alert(res.msg);
+                    return;
+                }
+
+                renderList(res.data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
+    function renderList(list) {
+        const container = document.getElementById("list");
+        container.innerHTML = "";
+
+        list.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "item";
+
+            div.innerHTML = `
+                <div class="info">
+                    <div>商品ID：${item.goodsId}</div>
+                    <div>秒杀价格：${item.seckillPrice}</div>
+                    <div>库存：${item.stockCount}</div>
+                    <div>开始时间：${item.startDate}</div>
+                    <div>结束时间：${item.endDate}</div>
+                </div>
+                <button class="btn" onclick="seckill(${item.goodsId})">
+                    秒杀
+                </button>
+            `;
+
+            container.appendChild(div);
+        });
+    }
+
+    function seckill(goodsId) {
+        fetch("/seckill/do_seckill", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+                goodsId: goodsId
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+
+                if (res.code !== 0) {
+                    alert(res.msg);
+                    return;
+                }
+
+                alert(res.data); // ⭐真正返回内容在 data 里
+            })
+            .catch(err => {
+                console.error(err);
+                alert("请求失败");
+            });
+    }
+</script>
+
+</body>
+</html>

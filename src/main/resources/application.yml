@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: myseckill
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/myseckill?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 20040917
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    timeout: 5000
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: org.example.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    org.example: debug
+    org.mybatis: debug

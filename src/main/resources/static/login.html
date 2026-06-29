@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+</head>
+
+<body>
+
+<h2>秒杀系统登录</h2>
+
+<div>
+    手机号：<input type="text" id="mobile" placeholder="请输入手机号">
+</div>
+
+<br>
+
+<div>
+    密码：<input type="password" id="password" placeholder="请输入密码">
+</div>
+
+<br>
+
+<button onclick="login()">登录</button>
+
+<p id="msg"></p>
+
+<script>
+    function login() {
+        const mobile = document.getElementById("mobile").value;
+        const password = document.getElementById("password").value;
+
+        fetch("/login/dologin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                mobile: mobile,
+                password: password
+            })
+        })
+            .then(res => res.json())
+            .then(res => {
+                console.log(res);
+
+                if (res.code === 0) {
+                    const token = res.data;
+
+                    localStorage.setItem("token", token);
+
+                    document.getElementById("msg").innerText = "登录成功！token已保存";
+                    window.location.href = "/goods.html";
+                } else {
+                    document.getElementById("msg").innerText = res.msg;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById("msg").innerText = "请求失败";
+            });
+    }
+</script>
+
+</body>
+</html>

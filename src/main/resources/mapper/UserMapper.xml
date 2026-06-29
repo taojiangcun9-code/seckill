@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.mapper.UserMapper">
+
+    <!-- 按手机号查询用户 -->
+    <select id="selectByPhone" resultType="org.example.entity.User">
+        SELECT
+        id,
+        phone,
+        password,
+        head,
+        register_date,
+        last_login_date,
+        login_count
+        FROM sk_user
+        WHERE phone = #{phone}
+        LIMIT 1
+    </select>
+
+</mapper>

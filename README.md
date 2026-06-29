@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 代码
 ## Redis
 前端发起登录请求后，由UserService.java校验并生成String token并存入redis，封装成Result对象返回到前端。
